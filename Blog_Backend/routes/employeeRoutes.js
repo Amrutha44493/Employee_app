@@ -6,12 +6,13 @@ const { authorizeRole } = require('../middleware/authMiddleware');
 // GET all employees 
 router.get('/', async (req, res) => {
   try {
-    const employees = await Employee.find();
-    res.json(employees);
+    const employees = await Employee.find(); 
+    res.json(employees); 
   } catch (error) {
     res.status(500).json({ message: 'Error fetching employees', error: error.message });
   }
 });
+
 
 // POST a new employee 
 router.post('/', authorizeRole('admin'), async (req, res) => {

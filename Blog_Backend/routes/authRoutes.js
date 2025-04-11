@@ -20,16 +20,36 @@ router.post('/register', async (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  console.log('Login attempt:', { username, password });
+
   try {
-    const { username, password } = req.body;
     const user = await User.findOne({ username });
-    if (!user || !(await user.comparePassword(password))) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+    console.log('Found user:', user);
+
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid username' });
     }
-    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    const isMatch = await user.comparePassword(password);
+    console.log(' Password match:', isMatch);
+
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid password' });
+    }
+
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    console.log('JWT generated:', token);
+
     res.json({ token, role: user.role });
   } catch (error) {
-    res.status(500).json({ message: 'Error logging in', error: error.message });
+    console.error('Login error:', error.message);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 

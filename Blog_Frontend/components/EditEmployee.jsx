@@ -19,13 +19,14 @@ const EditEmployee = () => {
       setLoading(true);
       setError('');
       try {
-        const response = await axios.get(`/api/employees/${id}`, {
+        const response = await axios.get(`http://localhost:4000/api/employees/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setName(response.data.name);
-        setEmail(response.data.email);
-        setDesignation(response.data.designation);
-        setDepartment(response.data.department);
+        const { name, email, designation, department } = response.data;
+        setName(name || '');
+        setEmail(email || '');
+        setDesignation(designation || '');
+        setDepartment(department || '');
       } catch (err) {
         setError('Failed to fetch employee details');
         console.error(err);
@@ -42,7 +43,7 @@ const EditEmployee = () => {
     setError('');
     try {
       await axios.put(
-        `/api/employees/${id}`,
+        `http://localhost:4000/api/employees/${id}`,
         { name, email, designation, department },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -53,13 +54,8 @@ const EditEmployee = () => {
     }
   };
 
-  if (loading) {
-    return <p>Loading </p>;
-  }
-
-  if (error) {
-    return <p style={{ color: 'red' }}>{error}</p>;
-  }
+  if (loading) return <p>Loading employee data...</p>;
+  if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
   return (
     <div>
@@ -73,7 +69,6 @@ const EditEmployee = () => {
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            required
           />
         </div>
         <div>
@@ -83,7 +78,6 @@ const EditEmployee = () => {
             id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
           />
         </div>
         <div>

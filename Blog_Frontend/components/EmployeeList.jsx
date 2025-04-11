@@ -14,13 +14,22 @@ const EmployeeList = () => {
       setLoading(true);
       setError('');
       try {
-        const response = await axios.get('/api/employees', {
+        const response = await axios.get('http://localhost:4000/api/employees', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setEmployees(response.data);
+        console.log('📦 Fetched employees:', response.data);
+        if (Array.isArray(response.data)) {
+          setEmployees(response.data);
+        } else {
+          setError('Failed to fetch employees: Received non-array data');
+          console.error('Received non-array data:', response.data);
+        }
       } catch (err) {
         setError('Failed to fetch employees');
-        console.error(err);
+        console.error('Error fetching employees:', err);
+        if (err.response && err.response.data) {
+          console.error('Server response:', err.response.data);
+        }
       } finally {
         setLoading(false);
       }
@@ -34,13 +43,16 @@ const EmployeeList = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this employee?')) {
       try {
-        await axios.delete(`/api/employees/${id}`, {
+        await axios.delete(`http://localhost:4000/api/employees/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setEmployees(employees.filter((emp) => emp._id !== id));
       } catch (err) {
         setError('Failed to delete employee');
         console.error(err);
+        if (err.response && err.response.data) {
+          console.error('Server response:', err.response.data);
+        }
       }
     }
   };

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../src/contexts/AuthContext';
-
 const AddEmployee = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -17,7 +16,7 @@ const AddEmployee = () => {
     setError('');
     try {
       await axios.post(
-        '/api/employees',
+        'http://localhost:4000/api/employees',
         { name, email, designation, department },
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -2,6 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../src/contexts/AuthContext';
+import {
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  Box,
+  Grid,
+} from '@mui/material';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -14,7 +22,10 @@ const LoginPage = () => {
     e.preventDefault();
     setError('');
     try {
-      const response = await axios.post('http://localhost:4000/api/auth/login', { username, password });
+      const response = await axios.post('http://localhost:4000/api/auth/login', {
+        username,
+        password,
+      });
       login(response.data.token, response.data.role);
       navigate('/employees');
     } catch (err) {
@@ -23,33 +34,56 @@ const LoginPage = () => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="username">Username:</label>
-          <input
-            type="text"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
-    </div>
+    <Grid
+      container
+      justifyContent="center"
+      alignItems="center"
+      style={{ minHeight: '100vh', backgroundColor: '#f5f5f5' }}
+    >
+      <Grid item xs={10} sm={6} md={4}>
+        <Paper elevation={3} sx={{ p: 4 }}>
+          <Typography variant="h5" gutterBottom align="center">
+            Login
+          </Typography>
+          {error && (
+            <Typography variant="body2" color="error" sx={{ mb: 2 }}>
+              {error}
+            </Typography>
+          )}
+          <form onSubmit={handleSubmit}>
+            <Box mb={2}>
+              <TextField
+                fullWidth
+                label="Username"
+                variant="outlined"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </Box>
+            <Box mb={2}>
+              <TextField
+                fullWidth
+                label="Password"
+                type="password"
+                variant="outlined"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </Box>
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              sx={{ backgroundColor: 'orange', '&:hover': { backgroundColor: '#e69500' } }}
+            >
+              Login
+            </Button>
+          </form>
+        </Paper>
+      </Grid>
+    </Grid>
   );
 };
 
