@@ -36,18 +36,5 @@ router.post('/login', async (req, res) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
-router.get('/add-admin', async (req, res) => {
-  const existing = await User.findOne({ username: "vaishakh33@gmail.com" });
-  if (existing) return res.send('Admin already exists');
-
-  const newUser = new User({
-    username: "vaishakh33@gmail.com",
-    password: "abcc1234",
-    role: "user",
-  });
-
-  await newUser.save();
-  res.send('dd user added successfully');
-});
 
 module.exports = router;
