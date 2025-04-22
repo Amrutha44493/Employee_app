@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const User = require('../models/User'); // Make sure this model is correct
+const User = require('../models/User'); 
 
 router.post('/login', async (req, res) => {
   const allUsers = await User.find();
   console.log('All users in DB:', allUsers);
   
   const { username, password } = req.body;
-  console.log('Login attempt with:', username, password); // 👈 Add this
+  console.log('Login attempt with:', username, password); 
 
   try {
     const user = await User.findOne({
@@ -26,13 +26,13 @@ router.post('/login', async (req, res) => {
 
     const token = jwt.sign(
       { userId: user._id, role: user.role },
-      process.env.JWT_SECRET || 'testsecret', // fallback for missing .env
+      process.env.JWT_SECRET || 'testsecret', 
       { expiresIn: '1h' }
     );
 
     return res.json({ token, role: user.role });
   } catch (error) {
-    console.error('Login error:', error); // 👈 Add this
+    console.error('Login error:', error); 
     return res.status(500).json({ message: 'Internal server error' });
   }
 });
