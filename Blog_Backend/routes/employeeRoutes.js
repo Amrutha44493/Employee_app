@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Employee = require('../models/Employee');
-const { authorizeRole } = require('../middleware/authMiddleware');
+const { authenticateToken, authorizeRole } = require('../middleware/authMiddleware');
 
-// GET all employees 
-router.get('/', async (req, res) => {
+// GET all employees (protected, any logged-in user)
+router.get('/', authenticateToken, async (req, res) => {
   try {
     const employees = await Employee.find(); 
     res.json(employees); 
@@ -13,9 +13,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-
-// POST a new employee 
-router.post('/', authorizeRole('admin'), async (req, res) => {
+// POST a new employee (admin only)
+router.post('/', authenticateToken, authorizeRole('admin'), async (req, res) => {
   const newEmployee = new Employee(req.body);
   try {
     const savedEmployee = await newEmployee.save();
@@ -25,8 +24,8 @@ router.post('/', authorizeRole('admin'), async (req, res) => {
   }
 });
 
-// GET a single employee 
-router.get('/:id', async (req, res) => {
+// GET a single employee (any logged-in user)
+router.get('/:id', authenticateToken, async (req, res) => {
   try {
     const employee = await Employee.findById(req.params.id);
     if (!employee) {
@@ -38,8 +37,8 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// PUT 
-router.put('/:id', authorizeRole('admin'), async (req, res) => {
+// PUT (admin only)
+router.put('/:id', authenticateToken, authorizeRole('admin'), async (req, res) => {
   try {
     const updatedEmployee = await Employee.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updatedEmployee) {
@@ -51,8 +50,8 @@ router.put('/:id', authorizeRole('admin'), async (req, res) => {
   }
 });
 
-// DELETE an employee 
-router.delete('/:id', authorizeRole('admin'), async (req, res) => {
+// DELETE an employee (admin only)
+router.delete('/:id', authenticateToken, authorizeRole('admin'), async (req, res) => {
   try {
     const deletedEmployee = await Employee.findByIdAndDelete(req.params.id);
     if (!deletedEmployee) {

@@ -22,11 +22,17 @@ const LoginPage = () => {
     e.preventDefault();
     setError('');
     try {
-      const response = await axios.post('http://localhost:4000/api/auth/login', {
+      const response = await axios.post('http://localhost:5000/api/auth/login', {
         username,
         password,
       });
+
+      // Save token to context
       login(response.data.token, response.data.role);
+
+      // ✅ Set the token for future requests
+      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+
       navigate('/employees');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');

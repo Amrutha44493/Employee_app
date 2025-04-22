@@ -2,6 +2,15 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../src/contexts/AuthContext';
+import {
+  TextField,
+  Button,
+  Container,
+  Typography,
+  Box,
+  CircularProgress,
+  Alert,
+} from '@mui/material';
 
 const EditEmployee = () => {
   const { id } = useParams();
@@ -19,7 +28,7 @@ const EditEmployee = () => {
       setLoading(true);
       setError('');
       try {
-        const response = await axios.get(`http://localhost:4000/api/employees/${id}`, {
+        const response = await axios.get(`http://localhost:5000/api/employees/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const { name, email, designation, department } = response.data;
@@ -43,7 +52,7 @@ const EditEmployee = () => {
     setError('');
     try {
       await axios.put(
-        `http://localhost:4000/api/employees/${id}`,
+        `http://localhost:5000/api/employees/${id}`,
         { name, email, designation, department },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -54,53 +63,75 @@ const EditEmployee = () => {
     }
   };
 
-  if (loading) return <p>Loading employee data...</p>;
-  if (error) return <p style={{ color: 'red' }}>{error}</p>;
+  if (loading) return (
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <CircularProgress />
+    </div>
+  );
+
+  if (error) return <Alert severity="error" sx={{ marginBottom: '16px' }}>{error}</Alert>;
 
   return (
-    <div>
-      <h2>Edit Employee</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="name">Name:</label>
-          <input
-            type="text"
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="designation">Designation:</label>
-          <input
-            type="text"
-            id="designation"
-            value={designation}
-            onChange={(e) => setDesignation(e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="department">Department:</label>
-          <input
-            type="text"
-            id="department"
-            value={department}
-            onChange={(e) => setDepartment(e.target.value)}
-          />
-        </div>
-        <button type="submit">Update Employee</button>
-      </form>
-    </div>
+    <Container
+      component="main"
+      maxWidth="xs"
+      sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh' }}
+    >
+      <Typography variant="h5" gutterBottom>
+        Edit Employee
+      </Typography>
+
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ mt: 1, width: '100%' }}
+      >
+        <TextField
+          fullWidth
+          label="Name"
+          variant="outlined"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          fullWidth
+          label="Email"
+          variant="outlined"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          fullWidth
+          label="Designation"
+          variant="outlined"
+          value={designation}
+          onChange={(e) => setDesignation(e.target.value)}
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          fullWidth
+          label="Department"
+          variant="outlined"
+          value={department}
+          onChange={(e) => setDepartment(e.target.value)}
+          sx={{ mb: 2 }}
+        />
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          fullWidth
+          sx={{ mt: 2 }}
+        >
+          Update Employee
+        </Button>
+      </Box>
+    </Container>
   );
 };
 

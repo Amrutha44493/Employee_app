@@ -1,20 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  IconButton,
+  Button,
+  Typography,
+  CircularProgress,
+  Alert,
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import { useAuth } from '../src/contexts/AuthContext';
 
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const { token, userRole } = useAuth();
+  const { token, userRole, logout } = useAuth();
 
   useEffect(() => {
     const fetchEmployees = async () => {
       setLoading(true);
       setError('');
       try {
-        const response = await axios.get('http://localhost:4000/api/employees', {
+        const response = await axios.get('http://localhost:5000/api/employees', {
           headers: { Authorization: `Bearer ${token}` },
         });
         console.log('📦 Fetched employees:', response.data);
@@ -43,7 +60,7 @@ const EmployeeList = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this employee?')) {
       try {
-        await axios.delete(`http://localhost:4000/api/employees/${id}`, {
+        await axios.delete(`http://localhost:5000/api/employees/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setEmployees(employees.filter((emp) => emp._id !== id));
@@ -57,48 +74,85 @@ const EmployeeList = () => {
     }
   };
 
+  const handleLogout = () => {
+    logout();  
+  };
+
   if (loading) {
-    return <p>Loading employees...</p>;
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+        <CircularProgress />
+      </div>
+    );
   }
 
   if (error) {
-    return <p style={{ color: 'red' }}>{error}</p>;
+    return (
+      <Alert severity="error" style={{ marginBottom: '16px' }}>
+        {error}
+      </Alert>
+    );
   }
 
   return (
     <div>
-      <h2>Employee List</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Designation</th>
-            <th>Department</th>
-            {userRole === 'admin' && (
-              <th>Actions</th>
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {employees.map((employee) => (
-            <tr key={employee._id}>
-              <td>{employee.name}</td>
-              <td>{employee.email}</td>
-              <td>{employee.designation}</td>
-              <td>{employee.department}</td>
-              {userRole === 'admin' && (
-                <td>
-                  <Link to={`/employees/edit/${employee._id}`}>Edit</Link>
-                  <button onClick={() => handleDelete(employee._id)}>Delete</button>
-                </td>
-              )}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <Typography variant="h4" gutterBottom sx={{ textAlign: 'center' }}>
+        Employee List
+      </Typography>
+      <Button
+  variant="contained"
+  color="warning"
+  onClick={handleLogout}
+  sx={{ marginBottom: '16px', ml: 'auto', display: 'block' }} 
+>
+  Logout
+</Button>
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="employee table">
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Designation</TableCell>
+              <TableCell>Department</TableCell>
+              {userRole === 'admin' && <TableCell align="right">Actions</TableCell>}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {employees.map((employee) => (
+              <TableRow key={employee._id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                <TableCell component="th" scope="row">
+                  {employee.name}
+                </TableCell>
+                <TableCell>{employee.email}</TableCell>
+                <TableCell>{employee.designation}</TableCell>
+                <TableCell>{employee.department}</TableCell>
+                {userRole === 'admin' && (
+                  <TableCell align="right">
+                    <IconButton component={Link} to={`/employees/edit/${employee._id}`} aria-label="edit">
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton onClick={() => handleDelete(employee._id)} aria-label="delete">
+                      <DeleteIcon color="error" />
+                    </IconButton>
+                  </TableCell>
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
       {userRole === 'admin' && (
-        <Link to="/employees/add">Add New Employee</Link>
+        <Button
+          component={Link}
+          to="/employees/add"
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          sx={{ mt: 2 }}
+        >
+          Add New Employee
+        </Button>
       )}
     </div>
   );
